@@ -12,6 +12,10 @@ MyPID::MyPID(uint16_t interval, float kP=0.0, float kI=0.0, float kD=0.0, uint16
 	this->params.kD = kD;
 	this->params.Imax = Imax;
 	this->interval = interval;
+	
+	// defaults:
+	lastError = 0;
+	integral = 0;
 }
 
 
@@ -21,11 +25,19 @@ double MyPID::updateController(double setPoint, double newValue)
 }
 
 
-double MyPID::updateController(double newError);
+double MyPID::updateController(double newError)
 {
-	//////////////////////////////////////////////////////////////////////////
-	// Not yet implemented
-	//////////////////////////////////////////////////////////////////////////
+	double dT = float(interval) * 0.001; // in seconds
+	
+	// I term
+	integral += (newError * params.kI) * dT;
+	integral = constrain(integral, -params.Imax, params.Imax); // Anti wind-up term
+	
+	// D term
+	double derivative = (newError - lastError) / dT;
+	lastError = newError;
+	
+	return newError*params.kP + integral + derivative*params.kD;
 }
 
 
@@ -91,9 +103,8 @@ uint16_t MyPID::getInterval()
 
 void MyPID::resetController()
 {
-	//////////////////////////////////////////////////////////////////////////
-	// Not yet implemented
-	//////////////////////////////////////////////////////////////////////////
+	lastError = 0;
+	integral = 0;
 }
 
 

@@ -35,12 +35,10 @@ class MyPID
 		
 		
 	private:
-	/*
-		static double deltaT; // [s]
+		//static double deltaT; // [s]
 		double lastError;
-		double integral;*/
-	
-	uint16_t interval; // time will not be calculated, just have to be run every interval (in milliseconds)
+		double integral;
+		uint16_t interval; // time will not be calculated, just have to be run every interval (in milliseconds)
 		
 		struct
 		{
