@@ -16,9 +16,10 @@
 class MyPID
 {
 	public:
-		MyPID(uint16_t, float, float, float, uint16_t); // interv, kp, ki, kd, imax
-		double updateController(double); // newError
-		double updateController(double, double); // setPoint, newValue
+		MyPID(uint16_t interval, float kP=0.0, float kI=0.0, float kD=0.0, uint16_t Imax=0); // interval in milliseconds
+		MyPID(float deltaTime, float kP=0.0, float kI=0.0, float kD=0.0, uint16_t Imax=0);
+		float updateController(float); // newError
+		float updateController(float, float); // setPoint, newValue
 		void setParameters(float, float, float, uint16_t);
 		void set_kP(float);
 		void set_kI(float);
@@ -29,16 +30,17 @@ class MyPID
 		float get_kD();
 		uint16_t get_Imax();
 		void setInterval(uint16_t);
-		uint16_t getInterval();
+		void setDeltaTime(float);
+		float getDeltaTime();
 		void resetController();
 		
 		
 		
 	private:
 		//static double deltaT; // [s]
-		double lastError;
-		double integral;
-		uint16_t interval; // time will not be calculated, just have to be run every interval (in milliseconds)
+		float lastError;
+		float integral;
+		float deltaTime;
 		
 		struct
 		{

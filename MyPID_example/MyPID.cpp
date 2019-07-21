@@ -5,13 +5,13 @@
 
 #include "MyPID.h"
 
-MyPID::MyPID(uint16_t interval, float kP=0.0, float kI=0.0, float kD=0.0, uint16_t Imax=0)
+MyPID::MyPID(uint16_t interval, float kP, float kI, float kD, uint16_t Imax)
 {
 	this->params.kP = kP;
 	this->params.kI = kI;
 	this->params.kD = kD;
 	this->params.Imax = Imax;
-	this->interval = interval;
+	this->deltaTime = interval * 0.001;
 	
 	// defaults:
 	lastError = 0;
@@ -19,22 +19,34 @@ MyPID::MyPID(uint16_t interval, float kP=0.0, float kI=0.0, float kD=0.0, uint16
 }
 
 
-double MyPID::updateController(double setPoint, double newValue)
+MyPID::MyPID(float deltaTime, float kP, float kI, float kD, uint16_t Imax)
+{
+	this->params.kP = kP;
+	this->params.kI = kI;
+	this->params.kD = kD;
+	this->params.Imax = Imax;
+	this->deltaTime = deltaTime;
+	
+	// defaults:
+	lastError = 0;
+	integral = 0;
+}
+
+
+float MyPID::updateController(float setPoint, float newValue)
 {
 	return updateController(setPoint-newValue);
 }
 
 
-double MyPID::updateController(double newError)
+float MyPID::updateController(float newError)
 {
-	double dT = float(interval) * 0.001; // in seconds
-	
 	// I term
-	integral += (newError * params.kI) * dT;
+	integral += (newError * params.kI) * deltaTime;
 	integral = constrain(integral, -params.Imax, params.Imax); // Anti wind-up term
 	
 	// D term
-	double derivative = (newError - lastError) / dT;
+	float derivative = (newError - lastError) / deltaTime;
 	lastError = newError;
 	
 	return newError*params.kP + integral + derivative*params.kD;
@@ -92,12 +104,19 @@ uint16_t MyPID::get_Imax()
 
 void MyPID::setInterval(uint16_t interval)
 {
-	this->interval = interval;
+	this->deltaTime = interval * 0.001;
 }
 
-uint16_t MyPID::getInterval()
+
+void MyPID::setDeltaTime(float deltaTIme)
 {
-	return interval;
+	this->deltaTime = deltaTIme;
+}
+
+
+float MyPID::getDeltaTime()
+{
+	return deltaTime;
 }
 
 
